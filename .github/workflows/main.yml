@@ -21,9 +21,9 @@ jobs:
           mkdir -p ~/.ssh
           echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa 3.111.170.198 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 3.111.170.198 >> ~/.ssh/known_hosts
 
       - name: Deploy to EC2
         run: |
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r . ec2-user@3.111.170.198:/home/ubuntu
-          ssh -i ~/.ssh/id_rsa ec2-user@3.111.170.198 'cd /home/ubuntu && python app.py'
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r . ec2-user@3.111.170.198:/home/ubuntu
+          ssh ec2-user@3.111.170.198 'cd /home/ubuntu && python app.py'
