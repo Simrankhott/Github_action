@@ -16,12 +16,15 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
       
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "$PRIVATE_KEY" > ~/.ssh/deploy_key.pem
+        chmod 600 ~/.ssh/deploy_key.pem
+        ssh-keyscan -H 3.111.170.198 >> ~/.ssh/known_hosts
+        ls -al ~/.ssh  # Debugging line to check the permissions
+        
     - name: Deploy to EC2
       run: |
-        echo "$PRIVATE_KEY" > deploy_key.pem
-        chmod 600 deploy_key.pem
-        ssh-keyscan -H 3.111.170.198 >> ~/.ssh/known_hosts
-        scp -i deploy_key.pem -r . ec2-user@3.111.170.198:/home/ubuntu
-        ssh -i deploy_key.pem ec2-user@3.111.170.198 'cd /home/ubuntu && python app.py'
-      env:
-        PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+        scp -i ~/.ssh/deploy_key.pem -r . ec2-user@3.111.170.198:/home/ubuntu
+        ssh -i ~/.ssh/deploy_key.pem ec2-user@3.111.170.198 'cd /home/ubuntu && python app.py'
