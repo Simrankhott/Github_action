@@ -16,14 +16,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "$PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 3.111.170.198 >> ~/.ssh/known_hosts
-
       - name: Deploy to EC2
         run: |
-          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r . ec2-user@3.111.170.198:/home/ubuntu
-          ssh ec2-user@3.111.170.198 'cd /home/ubuntu && python app.py'
+          scp -i /home/ubuntu/firstkey.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r . ec2-user@3.111.170.198:/home/ubuntu
+          ssh -i /home/ubuntu/firstkey.pem ec2-user@3.111.170.198 'cd /home/ubuntu && python app.py'
